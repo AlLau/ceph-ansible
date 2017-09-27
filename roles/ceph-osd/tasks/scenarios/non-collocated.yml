@@ -7,7 +7,7 @@
     docker run --net=host \
     --pid=host \
     --privileged=true \
-    --name=ceph-osd-prepare-{{ ansible_hostname }}-dev{{ item.1 | regex_replace('/', '') }} \
+    --name=ceph-osd-prepare-{{ ansible_hostname }}-{{ item.1 | to_uuid }} \
     -v /etc/ceph:/etc/ceph \
     -v /var/lib/ceph/:/var/lib/ceph/ \
     -v /dev:/dev \
@@ -35,7 +35,7 @@
     docker run --net=host \
     --pid=host \
     --privileged=true \
-    --name=ceph-osd-prepare-{{ ansible_hostname }}-dev{{ item.1 | regex_replace('/', '') }} \
+    --name=ceph-osd-prepare-{{ ansible_hostname }}-{{ item.1 | to_uuid }} \
     -v /etc/ceph:/etc/ceph \
     -v /var/lib/ceph/:/var/lib/ceph/ \
     -v /dev:/dev \

@@ -28,19 +28,31 @@
     group: "root"
     mode: "0644"
 
-- name: enable systemd unit file for osd instance
-  shell: systemctl enable ceph-osd@{{ item | basename }}.service
+- name: find osd id based on the device
+  command: >
+    docker run --name expose_partitions_{{ item | to_uuid }}
+    --privileged=true
+    -v /dev/:/dev/
+    -v /etc/ceph:/etc/ceph
+    -e OSD_DEVICE=/dev/{{ item | to_uuid }}
+    -e DISK_LIST_SEARCH=whoami
+    {{ ceph_docker_registry }}/{{ ceph_docker_image }}:{{ ceph_docker_image_tag }}
+    disk_list
   changed_when: false
   with_items: "{{ devices }}"
+  register: osd_ids
 
-- name: reload systemd unit files
-  shell: systemctl daemon-reload
-  changed_when: false
+- name: remove find osd id container
+  docker:
+    name: "expose_partitions_{{ item | to_uuid }}"
+    state: absent
+  with_items: "{{ devices }}"
 
 - name: systemd start osd container
-  service:
-    name: ceph-osd@{{ item | basename }}
+  systemd:
+    name: ceph-osd@{{ item.stdout }}
     state: started
     enabled: yes
+    daemon_reload: yes
   changed_when: false
-  with_items: "{{ devices }}"
+  with_items: "{{ osd_ids.results }}"
