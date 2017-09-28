@@ -1,0 +1,20 @@
+---
+- name: include deploy_monitors.yml
+  include: deploy_monitors.yml
+  when: not containerized_deployment
+
+- name: include start_monitor.yml
+  include: start_monitor.yml
+  when: not containerized_deployment
+
+- name: include ceph_keys.yml
+  include: ceph_keys.yml
+  when: not containerized_deployment
+  # this avoids the bug mentioned here: https://github.com/ansible/ansible/issues/18206
+  static: no
+
+- name: include secure_cluster.yml
+  include: secure_cluster.yml
+  when:
+    - not containerized_deployment
+    - secure_cluster

@@ -84,7 +84,6 @@
   changed_when: false
   when:
     - cephx
-    - containerized_deployment
     - groups[restapi_group_name] is defined
     - "{{ inventory_hostname == groups[mon_group_name] | last }}"
     - not containerized_deployment_with_kv
@@ -107,7 +106,6 @@
     changed_when: false
     when:
       - cephx
-      - containerized_deployment
       - "{{ groups.get(mgr_group_name, []) | length > 0 }}"
       - not containerized_deployment_with_kv
     with_items: "{{ groups.get(mgr_group_name, []) }}"
